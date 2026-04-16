@@ -81,7 +81,8 @@
 <script lang="ts" setup>
 import {
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   onAuthStateChanged,
   signOut
 } from "firebase/auth";
@@ -102,12 +103,17 @@ onMounted(() => {
   onAuthStateChanged(auth, (currentUser) => {
     userStore.setUser(currentUser);
   });
+
+  // Handle the result after returning from the Google login redirect
+  getRedirectResult(auth).catch((error) => {
+    console.error("Error processing Google Sign-In redirect:", error);
+  });
 });
 
 const withGoogle = async () => {
   const provider = new GoogleAuthProvider();
   try {
-    await signInWithPopup(auth, provider);
+    await signInWithRedirect(auth, provider);
   } catch (error) {
     console.error("Error during sign in:", error);
   }
